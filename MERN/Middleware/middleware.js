@@ -1,5 +1,6 @@
 const express=require("express");
 const app=express();
+const ExpressError=require("./ExpressError");
 
 // app.use((req,res)=>{
     // console.log("Hi.I am Middleware");  when we execute this only this respond is send ,res of other path is not send ,to do so we need to write next() ;
@@ -28,6 +29,40 @@ app.use("/random",(req,res,next)=>{
     console.log("I am only for /random ");
     next();
 });
+
+//API Token as Query String
+//Making middleware as fxn ans passing where we need it ,such as passing in app.get for "/api" path
+const checkToken=(req,res,next)=>{
+    let {token}=req.query;
+    if(token==="giveaccess"){
+        next();
+    }
+    else{
+        throw new ExpressError(401,"Access Denied");
+    }
+};
+
+//Error Handling
+app.get("/err",(req,res)=>{
+    abcd=abcd;
+});
+
+//Actity
+app.get("/admin",(req,res)=>{
+    throw new ExpressError(403,"Access is Forbidden");
+    
+});
+
+app.use((err,req,res,next)=>{
+    let {status,message}=err;
+    res.status(status).send(message);
+});
+
+
+app.get("/api",checkToken,(req,res)=>{
+    res.send("Data");
+});
+
 
 //404
 app.use((req,res)=>{
